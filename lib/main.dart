@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:glass/glass.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:parallax_effect_scrolling_flutter/assets.dart';
+import 'package:photo_view/photo_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -47,7 +49,6 @@ class _ParallxEffectState extends State<ParallxEffect> {
   void initState() {
     scrollController = ScrollController();
     super.initState();
-
     scrollController.addListener(() {
       setState(() {});
     });
@@ -61,14 +62,15 @@ class _ParallxEffectState extends State<ParallxEffect> {
       'Beauty of Nature',
       'PowerofFlower',
       'Just Feel It',
-      "Hi",
     ];
 
     return Scaffold(
       body: ListView.builder(
+        shrinkWrap: false,
         physics: const BouncingScrollPhysics(),
         controller: scrollController,
-        itemCount: 4,
+        itemCount: 4, // Ensure itemCount matches the length of texts or images
+        cacheExtent: size.height * 3, // Cache images for smooth scrolling
         itemBuilder: (context, index) {
           return Container(
             height: size.height,
@@ -90,21 +92,50 @@ class _ParallxEffectState extends State<ParallxEffect> {
                   height: size.height,
                   child: Image.asset(
                     'assets/images/image${index + 1}.jpg',
-                    // Assets.image0,
                     fit: BoxFit.cover,
                   ),
                 ),
                 Center(
-                  child: Text(
-                    texts[index],
-                    style: GoogleFonts.sanchez(
-                        fontSize: 50, color: Colors.white12),
-                  ),
-                )
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: InkWell(
+                      onTap: () {
+                        PhotoViewIndex(index: index);
+                      },
+                      child: Text(
+                        texts[index].toUpperCase(),
+                        style: GoogleFonts.sanchez(
+                            fontSize: 25,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white54),
+                      ),
+                    ),
+                  ).asGlass(clipBorderRadius: BorderRadius.circular(23)),
+                ),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class PhotoViewIndex extends StatelessWidget {
+  const PhotoViewIndex({super.key, required this.index});
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        child: PhotoView(
+          imageProvider: AssetImage(
+            'assets/images/image${index + 1}.jpg',
+          ),
+        ),
       ),
     );
   }
